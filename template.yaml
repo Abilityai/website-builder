@@ -1,0 +1,66 @@
+# Trinity-Compatible Agent Configuration — Website Builder
+name: website-builder
+display_name: "Website Builder"
+description: |
+  Builds and runs websites from a plain-language brief. Describe the site in chat;
+  it scaffolds a Next.js site, puts it in its own private GitHub repo, deploys it to
+  Vercel and answers with the live URL. Ask for a change later and it edits,
+  rebuilds and redeploys. Asks you once for anything the brief leaves open.
+version: "0.1.0"
+author: "Ability.ai"
+updated: "2026-10-21"
+tagline: "Describe a website, get a live URL"
+
+resources:
+  cpu: "2"
+  memory: "4g"
+
+use_cases:
+  - "Build a company or landing-page site from one paragraph"
+  - "Change copy, pages or style on a site it built, and redeploy"
+  - "Add a self-service editor (/studio) so the owner edits copy without code"
+
+capabilities:
+  - website_creation
+  - website_maintenance
+
+# Plugins — DECLARED (trinity#1704): installed on boot. create-agent carries the
+# website wizard (/create-agent:website) as the fallback when the library skill
+# create-website is not assigned. trinity is the standard platform plugin.
+plugins:
+  marketplaces:
+    - name: abilityai
+      source: abilityai/abilities
+  installed:
+    - create-agent@abilityai
+    - trinity@abilityai
+
+credentials:
+  env_file: [VERCEL_TOKEN, GITHUB_TOKEN]
+
+credential_setup:
+  - name: VERCEL_TOKEN
+    title: Vercel access token
+    description: Deploys each site to your Vercel account and redeploys it after every change.
+    required: true
+    secret: true
+    format: secret
+    setup_url: https://vercel.com/account/tokens
+  - name: GITHUB_TOKEN
+    title: GitHub token (fine-grained)
+    description: Creates one private repo per site and pushes to it. Needs Contents + Administration read/write. Optional if this agent already has a GitHub PAT set in Trinity.
+    required: false
+    secret: true
+    format: secret
+    setup_url: https://github.com/settings/personal-access-tokens/new
+
+skills:
+  - name: build-website
+    description: "Brief in → site scaffolded (library create-website, else the plugin wizard) → private repo → Vercel → live URL; same command edits and redeploys an existing site"
+
+schedules: []
+
+# The agent's own workspace is scratch: every site lives under ~/sites/<name> as its
+# own git repo. Nothing here is pushed back to this template.
+git:
+  push_enabled: false
