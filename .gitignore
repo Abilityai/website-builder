@@ -1,8 +1,27 @@
 # Sites are separate repos — never part of this agent
 sites/
+
+# Secrets
 .env
 .env.*
 !.env.example
+.mcp.json
+!.mcp.json.template
+*.pem
+*.key
+credentials.json
+
+# Claude Code + platform runtime state
+.claude/projects/
+.claude/statsig/
+.claude/todos/
+.claude/debug/
+.claude/sessions/
+.claude/shell-snapshots/
+.trinity/
+content/
+
+# Scratch
 .tmp/
 node_modules/
 .DS_Store
